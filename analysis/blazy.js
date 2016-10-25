@@ -72,7 +72,9 @@
         scope.options.srcset = scope.options.srcset || 'data-srcset';
         scope.options.src = _source = scope.options.src || 'data-src';
         _supportClosest = Element.prototype.closest;
+        // 新姿势 get√
         _isRetina = window.devicePixelRatio > 1;
+
         _viewport = {};
         _viewport.top = 0 - scope.options.offset;
         _viewport.left = 0 - scope.options.offset;
@@ -83,16 +85,19 @@
         scope.revalidate = function() {
             initialize(this);
         };
+        // 图片加载方法
         scope.load = function(elements, force) {
             var opt = this.options;
             if (elements.length === undefined) {
                 loadElement(elements, force, opt);
             } else {
+                // each 是一个辅助方法，对 elements 中的每一个元素代入到 func 中进行调用
                 each(elements, function(element) {
                     loadElement(element, force, opt);
                 });
             }
         };
+        // 顾名思义，解绑时进行释放和清理
         scope.destroy = function() {
             var self = this;
             var util = self._util;
@@ -116,6 +121,7 @@
         util.saveViewportOffsetT = throttle(function() {
             saveViewportOffset(scope.options.offset);
         }, scope.options.saveViewportOffsetDelay, scope);
+        // 改变 _viewport 里的 bottom 和 right
         saveViewportOffset(scope.options.offset);
 
         //handle multi-served image src (obsolete)
@@ -138,10 +144,10 @@
      ************************************/
     function initialize(self) {
         var util = self._util;
-        // First we create an array of elements to lazy load
+        // 通过 toArray 方法获取到所以需要进行 lazyloading 的 DOM
         util.elements = toArray(self.options);
         util.count = util.elements.length;
-        // Then we bind resize and scroll events if not already binded
+        // 绑定 resize 和 scroll 的事件监听
         if (util.destroyed) {
             util.destroyed = false;
             if (self.options.container) {
@@ -149,11 +155,13 @@
                     bindEvent(object, 'scroll', util.validateT);
                 });
             }
+            // resize 时触发的方法 saveViewportOffsetT 其作用其实就是调整偏移量
+            // 之后通过 validateT 方法进行懒加载的触发
             bindEvent(window, 'resize', util.saveViewportOffsetT);
             bindEvent(window, 'resize', util.validateT);
             bindEvent(window, 'scroll', util.validateT);
         }
-        // And finally, we start to lazy load.
+        // validate 方法才是真正进行懒加载的方法
         validate(self);
     }
 
@@ -176,14 +184,15 @@
     }
 
     function elementInView(ele, options) {
+        // getBoundingClientRect 用于获得页面中某个元素的左，上，右和下分别相对浏览器视窗的位置
         var rect = ele.getBoundingClientRect();
 
         if(options.container && _supportClosest){
-            // Is element inside a container?
+            // 如果设置了 container，通过 closest 匹配且离当前元素(ele)最近的祖先(options.containerClass)元素
             var elementContainer = ele.closest(options.containerClass);
             if(elementContainer){
                 var containerRect = elementContainer.getBoundingClientRect();
-                // Is container in view?
+                // 如果 container 在视野内，那么还要判断 element 是否也在视野内
                 if(inView(containerRect, _viewport)){
                     var containerRectWithOffset = {
                         top: containerRect.top - options.offset,
@@ -191,7 +200,6 @@
                         bottom: containerRect.bottom + options.offset,
                         left: containerRect.left - options.offset
                     };
-                    // Is element in view of container?
                     return inView(rect, containerRectWithOffset);
                 } else {
                     return false;
@@ -202,7 +210,7 @@
     }
 
     function inView(rect, viewport){
-        // Intersection
+        // 看是否有交集
         return rect.right >= viewport.left &&
                rect.bottom >= viewport.top &&
                rect.left <= viewport.right &&
@@ -214,6 +222,7 @@
         if (!hasClass(ele, options.successClass) && (force || options.loadInvisible || (ele.offsetWidth > 0 && ele.offsetHeight > 0))) {
             var dataSrc = getAttr(ele, _source) || getAttr(ele, options.src); // fallback to default 'data-src'
             if (dataSrc) {
+                // 用户可以设置多个图片 url，以应对 retina 屏幕的情况。默认情况下使用 | 进行分隔，也可以自定义分隔符
                 var dataSrcSplitted = dataSrc.split(options.separator);
                 var src = dataSrcSplitted[_isRetina && dataSrcSplitted.length > 1 ? 1 : 0];
                 var srcset = getAttr(ele, options.srcset);
@@ -278,10 +287,11 @@
         }
     }
 
+    // 加载完成之后进行收尾处理
+    // 增加一个标记成功的 class，调用 success 回调，并删除不必要的属性
     function itemLoaded(ele, options) {
         addClass(ele, options.successClass);
         if (options.success) options.success(ele);
-        // cleanup markup, remove data source attributes
         removeAttr(ele, options.src);
         removeAttr(ele, options.srcset);
         each(options.breakpoints, function(object) {
@@ -289,6 +299,7 @@
         });
     }
 
+    // 通过设置 attr 来达到加载图片的效果
     function handleSource(ele, attr, dataAttr) {
         var dataSrc = getAttr(ele, dataAttr);
         if (dataSrc) {
@@ -304,32 +315,29 @@
         ele.src = src; //src
     }
 
+    // 制作一些类似于 jQuery API 的 func
     function setAttr(ele, attr, value){
         ele.setAttribute(attr, value);
     }
-
     function getAttr(ele, attr) {
         return ele.getAttribute(attr);
     }
-
     function removeAttr(ele, attr){
         ele.removeAttribute(attr);
     }
-
     function equal(ele, str) {
         return ele.nodeName.toLowerCase() === str;
     }
-
     function hasClass(ele, className) {
         return (' ' + ele.className + ' ').indexOf(' ' + className + ' ') !== -1;
     }
-
     function addClass(ele, className) {
         if (!hasClass(ele, className)) {
             ele.className += ' ' + className;
         }
     }
 
+    // 获取 options 中 root 内部的所有 selector，并将其作为一个 Array 返回
     function toArray(options) {
         var array = [];
         var nodelist = (options.root).querySelectorAll(options.selector);
@@ -358,6 +366,7 @@
         }
     }
 
+    // 通过 loop 将 object 中的每一个元素代入到 fn 方法里
     function each(object, fn) {
         if (object && fn) {
             var l = object.length;
@@ -365,8 +374,8 @@
         }
     }
 
+    // 在限定时间内只能被调用一次，用来避免方法被过于频繁的调用
     function throttle(fn, minDelay, scope) {
-        // 在限定时间内只能被调用一次，用来避免方法被过于频繁的调用
         var lastCall = 0;
         return function() {
             var now = +new Date();
