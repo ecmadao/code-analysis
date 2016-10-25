@@ -232,9 +232,8 @@
                 // Image or background image
                 if (isImage || ele.src === undefined) {
                     var img = new Image();
-                    // using EventListener instead of onerror and onload
-                    // due to bug introduced in chrome v50
-                    // (https://productforums.google.com/forum/#!topic/chrome/p51Lk7vnP2o)
+                    // 之所以使用事件监听的方式而不使用 onerror 和 onload 方法，则是因为 chrome v50 里的一个 bug：
+                    // https://productforums.google.com/forum/#!topic/chrome/p51Lk7vnP2o
                     var onErrorHandler = function() {
                         if (options.error) options.error(ele, "invalid");
                         addClass(ele, options.errorClass);
@@ -307,7 +306,6 @@
             removeAttr(ele, dataAttr);
         }
     }
-
     function handleSources(ele, src, srcset){
         if(srcset) {
             setAttr(ele, _attrSrcset, srcset); //srcset
@@ -345,11 +343,13 @@
         return array;
     }
 
+    // 更新 _viewport 里记录的坐标范围
     function saveViewportOffset(offset) {
         _viewport.bottom = (window.innerHeight || document.documentElement.clientHeight) + offset;
         _viewport.right = (window.innerWidth || document.documentElement.clientWidth) + offset;
     }
 
+    // 绑定/解绑事件
     function bindEvent(ele, type, fn) {
         if (ele.attachEvent) {
             ele.attachEvent && ele.attachEvent('on' + type, fn);
@@ -357,7 +357,6 @@
             ele.addEventListener(type, fn, { capture: false, passive: true });
         }
     }
-
     function unbindEvent(ele, type, fn) {
         if (ele.detachEvent) {
             ele.detachEvent && ele.detachEvent('on' + type, fn);
