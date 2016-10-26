@@ -55,18 +55,24 @@
         util.elements = [];
         util.destroyed = true;
         scope.options = options || {};
+        // 失败/成功的回调
         scope.options.error = scope.options.error || false;
+        scope.options.success = scope.options.success || false;
+
         scope.options.offset = scope.options.offset || 100;
         scope.options.root = scope.options.root || document;
-        scope.options.success = scope.options.success || false;
         scope.options.selector = scope.options.selector || '.b-lazy';
         scope.options.separator = scope.options.separator || '|';
+
+        // options 中传入的 container 是一个 DOM 属性，譬如 class，在初始化时会根据这个参数以及 document.querySelectorAll 获取到所有需要懒加载的元素
         scope.options.containerClass = scope.options.container;
         scope.options.container = scope.options.containerClass ? document.querySelectorAll(scope.options.containerClass) : false;
+
         scope.options.errorClass = scope.options.errorClass || 'b-error';
+        scope.options.successClass = scope.options.successClass || 'b-loaded';
+
         scope.options.breakpoints = scope.options.breakpoints || false;
         scope.options.loadInvisible = scope.options.loadInvisible || false;
-        scope.options.successClass = scope.options.successClass || 'b-loaded';
         scope.options.validateDelay = scope.options.validateDelay || 25;
         scope.options.saveViewportOffsetDelay = scope.options.saveViewportOffsetDelay || 50;
         scope.options.srcset = scope.options.srcset || 'data-srcset';
