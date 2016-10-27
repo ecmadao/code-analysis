@@ -3,10 +3,10 @@
 
 ;(function(root, factory) {
   /*
-  * 和 blazy 里一样的套路，值得学习
-  * 检测包管理的类型 AMD/CommonJS/全局
-  * 可见：
-  * https://github.com/ecmadao/code-analysis/blob/master/analysis/blazy.js
+   * 和 blazy 里一样的套路，值得学习
+   * 检测包管理的类型 AMD/CommonJS/全局
+   * 可见：
+   * https://github.com/ecmadao/code-analysis/blob/master/analysis/blazy.js
    */
   if (typeof define === 'function' && define.amd) {
     define(factory);
@@ -38,13 +38,13 @@
   };
 
   /*
-  * 一个暴露的 API，用于更改 NProgress 默认的 Setting
-  *
-  * 使用例如
-  * NProgress.configure({
-  *  minimum: 0.1
-  * });
-  * 的方式进行调用
+   * 一个暴露的 API，用于更改 NProgress 默认的 Setting
+   *
+   * 使用例如
+   * NProgress.configure({
+   *  minimum: 0.1
+   * });
+   * 的方式进行调用
    */
   NProgress.configure = function(options) {
     var key, value;
@@ -63,10 +63,11 @@
   NProgress.status = null;
 
   /**
-   * Sets the progress bar status, where `n` is a number from `0.0` to `1.0`.
+   * 改变 progress 状态的 API，n 为数值，从 0.0 到 1.0
+   * 当 n 为 1 时，则将 NProgress.status 标记为 null，证明已完成
    *
-   *     NProgress.set(0.4);
-   *     NProgress.set(1.0);
+   * NProgress.set(0.4);
+   * NProgress.set(1.0);
    */
 
   NProgress.set = function(n) {
@@ -116,6 +117,8 @@
     return this;
   };
 
+  // 通过 NProgress.status 进行状态判断
+  // 当 NProgress.status 为数字时，则证明 progress 还在进行当中
   NProgress.isStarted = function() {
     return typeof NProgress.status === 'number';
   };
@@ -320,7 +323,7 @@
   };
 
   /*
-  * 辅助方法，确保数值 n 不会高于最大值，不会低于最小值
+   * 辅助方法，确保数值 n 不会高于最大值，不会低于最小值
    */
   function clamp(n, min, max) {
     if (n < min) return min;
@@ -329,10 +332,8 @@
   }
 
   /**
-   * (Internal) converts a percentage (`0..1`) to a bar translateX
-   * percentage (`-100%..0%`).
+   * 将 (0..1) 转换为 (-100%..0%) 以供 translateX 使用
    */
-
   function toBarPerc(n) {
     return (-1 + n) * 100;
   }
@@ -363,6 +364,11 @@
    * (Internal) Queues a function to be executed.
    */
 
+  /*
+   * queue 是一个自调用函数，最终真正返回一个 function
+   * 它接收一个 func 作为参数，将其插入到队列当中，然后从队列里取出后执行。
+   * 确保了每次只会执行一个 func
+   */
   var queue = (function() {
     var pending = [];
 

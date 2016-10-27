@@ -29,17 +29,17 @@
             var s = document.createStyleSheet();
             document.querySelectorAll = function(r, c, i, j, a) {
                 /*
-                * 参数 r 是一个由逗号连接的包含一个或多个CSS选择器的字符串
-                * 例如，"div.note, div.alert"
-                * 而通过 replace(/\[for\b/gi, '[htmlFor').split(',') 方法之后，转换为合法的Array形式参数
-                * ["div.note", "div.alert"]
+                 * 参数 r 是一个由逗号连接的包含一个或多个CSS选择器的字符串
+                 * 例如，"div.note, div.alert"
+                 * 而通过 replace(/\[for\b/gi, '[htmlFor').split(',') 方法之后，转换为合法的Array形式参数
+                 * ["div.note", "div.alert"]
                  */
                 a = document.all, c = [], r = r.replace(/\[for\b/gi, '[htmlFor').split(',');
                 for (i = r.length; i--;) {
                     /*
-                    * 通过 addRule 来在 <style></style> 中插入css
-                    * 例如，addRule('div.example', 'k:v')，则在<style>中插入了 div.example {k:v}
-                    * 通过这样的方式，在插入一个“k:v”之后遍历所有的 DOM（document.all），获取每个 DOM 的 currentStyle，检查是否存在 k，如果存在，则该 DOM就是被选择的 DOM
+                     * 通过 addRule 来在 <style></style> 中插入css
+                     * 例如，addRule('div.example', 'k:v')，则在<style>中插入了 div.example {k:v}
+                     * 通过这样的方式，在插入一个“k:v”之后遍历所有的 DOM（document.all），获取每个 DOM 的 currentStyle，检查是否存在 k，如果存在，则该 DOM就是被选择的 DOM
                      */
                     s.addRule(r[i], 'k:v');
                     for (j = a.length; j--;) a[j].currentStyle.k && c.push(a[j]);
