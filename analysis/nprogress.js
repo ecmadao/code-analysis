@@ -56,9 +56,6 @@
     return this;
   };
 
-  /**
-   * Last number.
-   */
   // 通过 status 来判断 progress 的状态。如果 status 是一个数字，则表示 progress 正在进行中
   NProgress.status = null;
 
@@ -69,7 +66,6 @@
    * NProgress.set(0.4);
    * NProgress.set(1.0);
    */
-
   NProgress.set = function(n) {
     var started = NProgress.isStarted();
 
@@ -85,7 +81,8 @@
     progress.offsetWidth; /* Repaint */
 
     queue(function(next) {
-      // Set positionUsing if it hasn't already been set
+      // 通过 NProgress.getPositioningCSS 方法获取到当前浏览器支持的 CSS 写法
+      // 以便确定通过改变何种 CSS 属性，来达到进度条的效果
       if (Settings.positionUsing === '') Settings.positionUsing = NProgress.getPositioningCSS();
 
       // Add transition
@@ -117,22 +114,28 @@
     return this;
   };
 
-  // 通过 NProgress.status 进行状态判断
-  // 当 NProgress.status 为数字时，则证明 progress 还在进行当中
+  /*
+   * 通过 NProgress.status 进行状态判断
+   * 当 NProgress.status 为数字时，则证明 progress 还在进行当中
+   */
   NProgress.isStarted = function() {
     return typeof NProgress.status === 'number';
   };
 
-  /**
-   * Shows the progress bar.
-   * This is the same as setting the status to 0%, except that it doesn't go backwards.
-   *
-   *     NProgress.start();
-   *
+  /*
+   * 开始 progress 的API，也可以通过 NProgress.set(number) 直接开始
+   * 如果之前没有 set，则通过 start 方法会赋予 0 作为初始值
    */
   NProgress.start = function() {
     if (!NProgress.status) NProgress.set(0);
 
+    /*
+     * 通过递归调用，作用类似于 setInterval
+     * 以 NProgress.status 作为是否继续进行的判断
+     * 以 Settings.trickle 作为能否可以开始的判断
+     * 在 NProgress.trickle 方法中首先通过 NProgress.inc 获取随机的合法数值，
+     * 之后通过 NProgress.set 进行 progressBar 的操作
+     */
     var work = function() {
       setTimeout(function() {
         if (!NProgress.status) return;
@@ -146,28 +149,21 @@
     return this;
   };
 
-  /**
-   * Hides the progress bar.
-   * This is the *sort of* the same as setting the status to 100%, with the
-   * difference being `done()` makes some placebo effect of some realistic motion.
-   *
-   *     NProgress.done();
-   *
-   * If `true` is passed, it will show the progress bar even if its hidden.
-   *
-   *     NProgress.done(true);
+  /*
+   * 对外暴露的完成 progress 的 API，通过 NProgress.done() 进行调用
+   * 如果 传入 true 参数，例如 NProgress.done(true)，则 progress 在完成之后也不会消失
+   * 可以看到，在调用 NProgress.done 方法时，首先会通过 NProgress.inc 方法进行一个随机的进度增长，
+   * 之后才通过 set(1) 将其完成
    */
-
   NProgress.done = function(force) {
     if (!force && !NProgress.status) return this;
 
     return NProgress.inc(0.3 + 0.5 * Math.random()).set(1);
   };
 
-  /**
-   * Increments by a random amount.
+  /*
+   * 获取一个随机的合法数值，作为 progress number 的增长值
    */
-
   NProgress.inc = function(amount) {
     var n = NProgress.status;
 
@@ -200,6 +196,9 @@
     }
   };
 
+  /*
+   * 获取一个随机数，并通过 NProgress.set 改变进度
+   */
   NProgress.trickle = function() {
     return NProgress.inc();
   };
@@ -240,12 +239,14 @@
 
   })();
 
-  /**
-   * (Internal) renders the progress bar markup based on the `template`
-   * setting.
+  /*
+   * progress DOM 的构建方法
+   * 会以 isRendered() 作为是否已经构建 DOM 的标识，是则通过选择器选择出 progress DOM 并返回，
+   * 否则通过 Settings.template，向 Settings.parent 中插入 DOM
+   * 最终返回的都是 progress DOM 元素
    */
-
   NProgress.render = function(fromStart) {
+    // 通过 NProgress.isRendered() 标识确保一次只会渲染一个 nprogress DOM
     if (NProgress.isRendered()) return document.getElementById('nprogress');
 
     addClass(document.documentElement, 'nprogress-busy');
@@ -277,10 +278,9 @@
     return progress;
   };
 
-  /**
-   * Removes the element. Opposite of render().
+  /*
+   * progress 的 remove 方法，从 DOM 中删除
    */
-
   NProgress.remove = function() {
     removeClass(document.documentElement, 'nprogress-busy');
     removeClass(document.querySelector(Settings.parent), 'nprogress-custom-parent');
@@ -288,36 +288,38 @@
     progress && removeElement(progress);
   };
 
-  /**
-   * Checks if the progress bar is rendered.
+  /*
+   * 通过 getElementById 检查 HTML 中是否已存在 progress DOM
    */
-
   NProgress.isRendered = function() {
     return !!document.getElementById('nprogress');
   };
 
-  /**
-   * Determine which positioning CSS rule to use.
+  /*
+   * 获取可行的 CSS 规则
+   * 通过判断浏览器支持的兼容性写法，最终返回
+   * translate3d、translate 或 margin
    */
-
   NProgress.getPositioningCSS = function() {
     // Sniff on document.body.style
     var bodyStyle = document.body.style;
 
-    // Sniff prefixes
+    // 通过这个判断，来获取浏览器所支持的兼容性写法
     var vendorPrefix = ('WebkitTransform' in bodyStyle) ? 'Webkit' :
                        ('MozTransform' in bodyStyle) ? 'Moz' :
                        ('msTransform' in bodyStyle) ? 'ms' :
                        ('OTransform' in bodyStyle) ? 'O' : '';
 
     if (vendorPrefix + 'Perspective' in bodyStyle) {
-      // Modern browsers with 3D support, e.g. Webkit, IE10
+      // 如果 document.body.style 中存在 vendorPrefix + 'Perspective'，则
+      // 可以认为是现代浏览器，支持 3D 属性（例如 Webkit, IE10），因此可以使用 translate3d
       return 'translate3d';
     } else if (vendorPrefix + 'Transform' in bodyStyle) {
-      // Browsers without 3D support, e.g. IE9
+      // 对于没有 translate3d 支持，但支持 Transform 的浏览器（例如 IE9）
+      // 则使用 translate
       return 'translate';
     } else {
-      // Browsers without translate() support, e.g. IE7-8
+      // 否则只能使用 margin 的方法（例如 IE7-8）
       return 'margin';
     }
   };
@@ -338,12 +340,9 @@
     return (-1 + n) * 100;
   }
 
-
-  /**
-   * (Internal) returns the correct CSS for changing the bar's
-   * position given an n percentage, and speed and ease from Settings
+  /*
+   * 利用 Settings.positionUsing 进行判断，使用不同方法改变 progress 的CSS
    */
-
   function barPositionCSS(n, speed, ease) {
     var barCSS;
 
@@ -359,10 +358,6 @@
 
     return barCSS;
   }
-
-  /**
-   * (Internal) Queues a function to be executed.
-   */
 
   /*
    * queue 是一个自调用函数，最终真正返回一个 function
