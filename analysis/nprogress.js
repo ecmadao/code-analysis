@@ -78,14 +78,15 @@
         speed    = Settings.speed,
         ease     = Settings.easing;
 
-    progress.offsetWidth; /* Repaint */
+    // 通过获取 offsetWidth 来使其进行重绘
+    progress.offsetWidth;
 
     queue(function(next) {
       // 通过 NProgress.getPositioningCSS 方法获取到当前浏览器支持的 CSS 写法
       // 以便确定通过改变何种 CSS 属性，来达到进度条的效果
       if (Settings.positionUsing === '') Settings.positionUsing = NProgress.getPositioningCSS();
 
-      // Add transition
+      // 增加 transition
       css(bar, barPositionCSS(n, speed, ease));
 
       if (n === 1) {
@@ -387,25 +388,42 @@
    * While this helper does assist with vendor prefixed property names, it
    * does not perform any manipulation of values prior to setting styles.
    */
-
+  /*
+   * 类似于 jQuery 的 css() 函数
+   */
   var css = (function() {
     var cssPrefixes = [ 'Webkit', 'O', 'Moz', 'ms' ],
         cssProps    = {};
 
+    /*
+     * 针对兼容行写法的 CSS进行转换
+     * 将 -ms-xxx 转换为 msXxx
+     * 将 -webkit-xxx 转换为 WebkitXxx
+     * 将 -o-xxx 转换为 OXxx
+     * 将 -moz-xxx 转换为 MozXxx
+     * xxx 依旧是 xxx
+     */
     function camelCase(string) {
       return string.replace(/^-ms-/, 'ms-').replace(/-([\da-z])/gi, function(match, letter) {
         return letter.toUpperCase();
       });
     }
 
+    /*
+     * 通过 camelCase 方法，可以将有兼容性写法的 CSS 进行首字母大写转换，但普通 CSS 则没有作用
+     * 而 getVendorProp 作用在于获取普通 CSS 的兼容性支持（按照 cssPrefixes 里的预设），
+     * 并进行首字母大写转换
+     */
     function getVendorProp(name) {
       var style = document.body.style;
       if (name in style) return name;
 
       var i = cssPrefixes.length,
+          // 将 CSS 名称进行首字母大写转换
           capName = name.charAt(0).toUpperCase() + name.slice(1),
           vendorName;
       while (i--) {
+        // 检查存在的 CSS 写法并将其返回
         vendorName = cssPrefixes[i] + capName;
         if (vendorName in style) return vendorName;
       }
@@ -413,22 +431,34 @@
       return name;
     }
 
+    /*
+     * 获取 css 兼容性写法，
+     * 若没有则通过 getVendorProp 获取，并赋予进 cssProps obj
+     */
     function getStyleProp(name) {
       name = camelCase(name);
       return cssProps[name] || (cssProps[name] = getVendorProp(name));
     }
 
+    /*
+     * 将正确的 CSS 赋予 element
+     */
     function applyCss(element, prop, value) {
       prop = getStyleProp(prop);
       element.style[prop] = value;
     }
 
+    /*
+     * 接受 (DOM, 属性组成的obj)
+     * 也接受 (DOM, key, value) 的形式
+     */
     return function(element, properties) {
       var args = arguments,
           prop,
           value;
 
       if (args.length == 2) {
+        // loop 获取 properties 中的合法属性，依次对 element 进行属性改变
         for (prop in properties) {
           value = properties[prop];
           if (value !== undefined && properties.hasOwnProperty(prop)) applyCss(element, prop, value);
@@ -439,60 +469,66 @@
     }
   })();
 
-  /**
-   * (Internal) Determines if an element or space separated list of class names contains a class name.
+  /*
+   * 仿造 jQuery API
+   * hasClass
+   * addClass
+   * removeClass
    */
 
+  /*
+   * element 应该是已经经过 classList 格式化返回的 String，否则就通过 classList 进行格式化
+   * 使用 indexOf 进行判断
+   */
   function hasClass(element, name) {
     var list = typeof element == 'string' ? element : classList(element);
     return list.indexOf(' ' + name + ' ') >= 0;
   }
 
-  /**
-   * (Internal) Adds a class to an element.
+  /*
+   * 新增 className 的 func
+   * 通过 hasClass 检查是否已存在
+   * 若否，则在 String 类型的 className 后面新增 class，并去除空格
    */
-
   function addClass(element, name) {
     var oldList = classList(element),
         newList = oldList + name;
 
     if (hasClass(oldList, name)) return;
 
-    // Trim the opening space.
+    // 去除开头的空格
     element.className = newList.substring(1);
   }
 
-  /**
-   * (Internal) Removes a class from an element.
+  /*
+   * 移除 className 的 func
    */
-
   function removeClass(element, name) {
     var oldList = classList(element),
         newList;
 
     if (!hasClass(element, name)) return;
 
-    // Replace the class name.
+    // 将 ' className ' 替换为 ' ' 以达到删除效果
     newList = oldList.replace(' ' + name + ' ', ' ');
 
-    // Trim the opening and closing spaces.
+    // 去除开头和结尾的空格
     element.className = newList.substring(1, newList.length - 1);
   }
 
-  /**
-   * (Internal) Gets a space separated list of the class names on the element.
-   * The list is wrapped with a single space on each end to facilitate finding
-   * matches within the list.
+  /*
+   * 返回一个由 className 组成的 String，不同 className 之间使用空格分隔
+   * {className: 'main_wrapper'} 返回 ' main_wrapper '
+   * {className: 'main_wrapper test'} 返回 ' main_wrapper test '
+   * 注：返回结果在不同 className 之间使用空格连接，且 String 的开头和结尾都有空格
    */
-
   function classList(element) {
     return (' ' + (element && element.className || '') + ' ').replace(/\s+/gi, ' ');
   }
 
-  /**
-   * (Internal) Removes an element from the DOM.
+  /*
+   * 从 parentNode 中删除目标 DOM
    */
-
   function removeElement(element) {
     element && element.parentNode && element.parentNode.removeChild(element);
   }
