@@ -1,4 +1,13 @@
-# code-analysis
+![code-analysis](./code-analysis.png)
+
+> 针对一些 github 上的开源项目进行源码分析
+>
+> 欢迎`pull request` & `issue`提出值得分析源码的项目
+
+首要满足：
+
+- 源码短小精悍
+- 有学习的价值
 
 ## Menu
 
@@ -41,7 +50,7 @@
 - 原生方法的缓存
 - 浏览器`Notification`API的使用
 
-### [nprogress]()
+### [nprogress](https://github.com/rstacruz/nprogress)
 
 > 源码分析戳这里：[nprogress analysis](./analysis/nprogress.js)
 
@@ -53,6 +62,13 @@
 - 获取浏览器支持的兼容性 CSS
 - 递归调用 func
 - 构造类似 jQuery API 的函数
+
+## Todo
+
+- [ ] [iNotify.js](https://github.com/jaywcjlove/iNotify)
+- [ ] [push.js](https://github.com/Nickersoft/push.js)
+
+> 欢迎`pull request` & `issue`提出值得分析源码的项目
 
 ## Author
 
