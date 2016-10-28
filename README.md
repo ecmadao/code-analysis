@@ -67,6 +67,7 @@
 
 - [ ] [iNotify.js](https://github.com/jaywcjlove/iNotify)
 - [ ] [push.js](https://github.com/Nickersoft/push.js)
+- [ ] [cookies.js](https://github.com/franciscop/cookies.js)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
