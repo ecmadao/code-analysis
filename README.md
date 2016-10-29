@@ -63,11 +63,29 @@
 - 递归调用 func
 - 构造类似 jQuery API 的函数
 
+### [cookies.js](https://github.com/franciscop/cookies.js)
+
+> 源码分析戳这里：[cookies.js analysis](./analysis/cookies.js)
+
+提供了友好的`cookie`操作 API，例如：
+
+```javascript
+cookies({ token: '42' });     // Set it
+var token = cookies('token'); // Get it
+cookies({ token: null });     // Eat it
+```
+
+值得学习的方面：
+
+- `cookie`操作
+- `cookie`数据转换及处理
+- 容错处理
+
 ## Todo
 
 - [ ] [iNotify.js](https://github.com/jaywcjlove/iNotify)
 - [ ] [push.js](https://github.com/Nickersoft/push.js)
-- [ ] [cookies.js](https://github.com/franciscop/cookies.js)
+- [x] [cookies.js](https://github.com/franciscop/cookies.js)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
