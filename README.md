@@ -65,7 +65,7 @@
 
 ### [cookies.js](https://github.com/franciscop/cookies.js)
 
-> 源码分析戳这里：[cookies.js analysis](./analysis/cookies.js)
+> 源码分析戳这里：[cookies.js analysis](./analysis/storage/cookies.js)
 
 提供了友好的`cookie`操作 API，例如：
 
@@ -83,7 +83,7 @@ cookies({ token: null });     // Eat it
 
 ### [store.js](https://github.com/marcuswestin/store.js)
 
-> 源码分析戳这里：[store.js analysis](./analysis/store.js)
+> 源码分析戳这里：[store.js analysis](./analysis/storage/store.js)
 
 通过封装`localStorage` API，提供了友好的操作，并兼容IE，可储存`Object`
 
