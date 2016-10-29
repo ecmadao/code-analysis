@@ -81,11 +81,22 @@ cookies({ token: null });     // Eat it
 - `cookie`数据转换及处理
 - 容错处理
 
+### [store.js](https://github.com/marcuswestin/store.js)
+
+> 源码分析戳这里：[store.js analysis](./analysis/store.js)
+
+通过封装`localStorage` API，提供了友好的操作，并兼容IE，可储存`Object`
+
+值得学习的方面：
+
+- `localStorage`操作
+- `userData`操作
+
 ## Todo
 
-- [ ] [iNotify.js](https://github.com/jaywcjlove/iNotify)
 - [ ] [push.js](https://github.com/Nickersoft/push.js)
 - [x] [cookies.js](https://github.com/franciscop/cookies.js)
+- [x] [store.js](https://github.com/marcuswestin/store.js)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
