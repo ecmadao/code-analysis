@@ -1,7 +1,7 @@
 /**
  * Push
  * =======
- * A compact, cross-browser solution for the JavaScript Notifications API
+ * 一个跨浏览器的 JavaScript Notifications API
  */
 
 (function (global, factory) {
@@ -33,6 +33,7 @@
 
         var
         self = this,
+        // 通过 helper 进行类型检查
         isUndefined   = function (obj) { return obj === undefined; },
         isString   = function (obj) { return String(obj) === obj },
         isFunction = function (obj) { return obj && {}.toString.call(obj) === '[object Function]'; },
@@ -89,7 +90,7 @@
         },
 
         /**
-         * 新增 notification，将 notification 增加进 notifications Object 中
+         * 新增 notification，将 notification 增加进 notifications Object 中，递增现有 ID
          * @param notification 对象
          * @return 返回 notification ID，类型为 Int
          */
@@ -135,9 +136,9 @@
                 id,
                 onClose;
 
-            /* Set empty settings if none are specified */
             options = options || {};
 
+            // sw.js 是一个空的 js 文件
             /* Set the last service worker path for testing */
             self.lastWorkerPath = options.serviceWorker || 'sw.js';
 
@@ -149,11 +150,11 @@
                 }
             };
 
-            /* Safari 6+, Firefox 22+, Chrome 22+, Opera 25+ */
             if (w.Notification) {
               /*
                * Safari 6+, Firefox 22+, Chrome 22+, Opera 25+ 支持的 window.Notification API
                * 通过 new window.Notification(title, options) 新建一个 Notification 实例
+               *
                * options:
                *  {
                *    dir: 通知的文本显示方向
@@ -174,6 +175,12 @@
                         }
                     );
                 } catch (e) {
+                  /*
+                   * navigator.serviceWorker 是个只读属性，返回 associated document 的 ServiceWorkerContainer 对象，这个对象提供注册、删除、更新以及和 ServiceWorker 通信的功能
+                   * 通过 register 方法针对一个 scriptURL 来创建或更新 ServiceWorkerRegistration，
+                   * 并返回一个 Promise 对象，可在之后的回调里使用 ServiceWorkerRegistration 对象，
+                   * 它具有 showNotification、getNotification API
+                   */
                     if (w.navigator) {
                         w.navigator.serviceWorker.register(options.serviceWorker || 'sw.js');
                         w.navigator.serviceWorker.ready.then(function(registration) {
@@ -192,8 +199,15 @@
                     }
                 }
 
-            /* 老版本 webkit 浏览器 */
             } else if (w.webkitNotifications) {
+              /*
+               * 老版本 webkit 浏览器
+               * 利用 window.webkitNotifications.createNotification(params) 或 window.webkitNotifications.createHTMLNotification(params) 方法来创建一个 Notification 对象
+               * 调用刚刚创建的 Notification 对象的 show() 方法来进行显示
+               *
+               * params:
+               * icon, title, body
+               */
 
                 notification = w.webkitNotifications.createNotification(
                     options.icon,
@@ -203,9 +217,14 @@
 
                 notification.show();
 
-            /* Firefox Mobile */
             } else if (navigator.mozNotification) {
-
+              /*
+               * 针对 Firefox 手机端浏览器
+               * navigator.mozNotification.createNotification(params) 构造实例
+               *
+               * params:
+               * title, body, icon
+               */
                 notification = navigator.mozNotification.createNotification(
                     title,
                     options.body,
@@ -214,11 +233,16 @@
 
                 notification.show();
 
-            /* IE9+ */
             } else if (w.external && w.external.msIsSiteMode()) {
+              /*
+               * 针对 IE9 及以上的浏览器
+               * 在 IE 下的 notification 与其他浏览器不同，仅仅是闪烁标签页，直到用户单击该按钮将该窗口在前台显示
+               * 每次调用，需先通过 msSiteModeClearIconOverlay 清除已有通知，之后通过 msSiteModeSetIconOverlay 新建通知，再使用 msSiteModeActivate 进行激活
+               */
 
-                //Clear any previous notifications
+                // 清除之前的通知
                 w.external.msSiteModeClearIconOverlay();
+
                 w.external.msSiteModeSetIconOverlay(
                     ((isString(options.icon) || isUndefined(options.icon))
                     ? options.icon
@@ -226,15 +250,15 @@
                 );
                 w.external.msSiteModeActivate();
 
-                notification = {};
+                notifications = {};
             } else {
                 throw new Error('Unable to create notification: unknown interface');
             }
 
-            /* Add it to the global array */
+            // 将新增的 notification 加入全局的 notifications 对象中储存起来，并获取其 ID
             id = addNotification(notification);
 
-            /* Wrapper used to get/close notification later on */
+            // 在 wrapper 内构建 get/close API，并将暴露出去供外部使用
             wrapper = {
                 get: function () {
                     return notification;
@@ -245,7 +269,7 @@
                 }
             };
 
-            /* Autoclose timeout */
+            // 如有过期时间，则将自动关闭
             if (options.timeout) {
                 setTimeout(function () {
                     wrapper.close();
@@ -253,7 +277,7 @@
             }
 
             if (typeof(notification) !== 'undefined') {
-                /* Notification callbacks */
+                /* Notification 回调 */
                 if (isFunction(options.onShow))
                     notification.addEventListener('show', options.onShow);
 
@@ -278,14 +302,16 @@
                 });
             }
 
-
-            /* Return the wrapper so the user can call close() */
+            // 暴露给外部，用户可以通过它进行 get/close 回调
             return wrapper;
         },
 
         /**
-         * Permission types
+         * 定义权限类型
          * @enum {String}
+         * granted: 用户同意 notification
+         * denied: 用户拒绝 notification
+         * default: 默认，相当于 denied
          */
         Permission = {
             DEFAULT: 'default',
@@ -303,18 +329,18 @@
         /*****************/
 
         /**
-         * Requests permission for desktop notifications
+         * notification 请求用户允许通知时的回调
          * @param {Function} callback - Function to execute once permission is granted
          * @return {void}
          */
         self.Permission.request = function (onGranted, onDenied) {
 
-            /* Return if Push not supported */
+            // 在浏览器不支持通知的时候抛出错误
             if (!self.isSupported) {
                 throw new Error(incompatibilityErrorMessage);
             }
 
-            /* Default callback */
+            // 默认回调，对获取权限的结果进行判断和处理
             callback = function (result) {
 
                 switch (result) {
@@ -346,15 +372,15 @@
         };
 
         /**
-         * Returns whether Push has been granted permission to run
-         * @return {Boolean}
+         * 判断是否获取了 notification 的权限
+         * @return 返回一个 Boolean
          */
         self.Permission.has = function () {
             return hasPermission;
         };
 
         /**
-         * Gets the permission level
+         * 获取 permission 等级
          * @return {Permission} The permission level
          */
         self.Permission.get = function () {
@@ -396,7 +422,7 @@
         /*********************/
 
         /**
-         * Detects whether the user's browser supports notifications
+         * 检测用户的浏览器是否支持 permission
          * @return {Boolean}
          */
         self.isSupported = (function () {
@@ -426,23 +452,23 @@
          })();
 
          /**
-          * Creates and displays a new notification
+          * 创建一个新的 notification
           * @param {Array} options
           * @return {void}
           */
         self.create = function (title, options) {
 
-            /* Fail if the browser is not supported */
+            // 当前浏览器不支持时抛出错误
             if (!self.isSupported) {
                 throw new Error(incompatibilityErrorMessage);
             }
 
-            /* Fail if no or an invalid title is provided */
+            // 检测 title 合法性
             if (!isString(title)) {
                 throw new Error('PushError: Title of notification must be a string');
             }
 
-            /* Request permission if it isn't granted */
+            // 请求通知权限
             if (!self.Permission.has()) {
                 return new Promise(function(resolve, reject) {
                     self.Permission.request(function() {
@@ -468,7 +494,7 @@
         };
 
         /**
-         * Returns the notification count
+         * 返回 notification 的数量
          * @return {Integer} The notification count
          */
         self.count = function () {
@@ -490,24 +516,23 @@
         },
 
         /**
-         * Closes a notification with the given tag
+         * 通过 tag 来关闭 notification
          * @param {String} tag - Tag of the notification to close
-         * @return {Boolean} boolean denoting success
+         * @return {Boolean} 返回代表是否成功关闭的 Boolean
          */
         self.close = function (tag) {
             var key;
             for (key in notifications) {
                 notification = notifications[key];
-                /* Run only if the tags match */
+                // 如果 tag 匹配了，则通过 ID 关闭 notification
                 if (notification.tag === tag) {
-                    /* Call the notification's close() method */
                     return closeNotification(key);
                 }
             }
         };
 
         /**
-         * Clears all notifications
+         * 清除所有的 notification
          * @return {void}
          */
         self.clear = function () {

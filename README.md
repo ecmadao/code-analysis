@@ -50,6 +50,19 @@
 - 原生方法的缓存
 - 浏览器`Notification`API的使用
 
+### [push.js](https://github.com/Nickersoft/push.js)
+
+> 源码分析戳这里：[push.js analysis](./analysis/notification/push.js)
+
+一个兼容多平台多种类浏览器的 notification 插件，封装了各种浏览器下的`Notification API`
+
+值得学习的方面：
+
+- 浏览器兼容性处理
+- 不同平台/浏览器下的`Notification API`
+- 对不同接口进行统一封装
+- helper 类方法，对 func 等对象进行类型检查
+
 ### [nprogress](https://github.com/rstacruz/nprogress)
 
 > 源码分析戳这里：[nprogress analysis](./analysis/nprogress.js)
@@ -94,7 +107,7 @@ cookies({ token: null });     // Eat it
 
 ## Todo
 
-- [ ] [push.js](https://github.com/Nickersoft/push.js)
+- [x] [push.js](https://github.com/Nickersoft/push.js)
 - [x] [cookies.js](https://github.com/franciscop/cookies.js)
 - [x] [store.js](https://github.com/marcuswestin/store.js)
 
