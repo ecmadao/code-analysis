@@ -105,11 +105,29 @@ cookies({ token: null });     // Eat it
 - `localStorage`操作
 - `userData`操作
 
+### [jquery.hotkeys](https://github.com/jeresig/jquery.hotkeys)
+
+> 源码分析戳这里：[jquery.hotkeys analysis](./analysis/hotkey/jquery.hotkeys.js)
+
+一个依赖于 jQuery 的插件，提供按键监听：
+
+```javascript
+// 例如
+$(document).bind('keydown', 'ctrl+a', fn);
+```
+
+值得学习的方面：
+
+- jQuery 插件编写
+- 键盘事件的监听和处理
+
 ## Todo
 
 - [x] [push.js](https://github.com/Nickersoft/push.js)
 - [x] [cookies.js](https://github.com/franciscop/cookies.js)
 - [x] [store.js](https://github.com/marcuswestin/store.js)
+- [ ] [KeyboardJS](https://github.com/RobertWHurst/KeyboardJS)
+- [ ] [jquery.hotkeys](https://github.com/jeresig/jquery.hotkeys)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
