@@ -1,21 +1,11 @@
-/*jslint browser: true*/
-/*jslint jquery: true*/
-
 /*
  * jQuery Hotkeys Plugin
- * Copyright 2010, John Resig
- * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Based upon the plugin by Tzury Bar Yochay:
+ * 基于 Tzury Bar Yochay 编写的插件:
  * https://github.com/tzuryby/jquery.hotkeys
  *
- * Original idea by:
+ * 最初的想法起源于:
  * Binny V A, http://www.openjs.com/scripts/events/keyboard_shortcuts/
- */
-
-/*
- * One small change is: now keys are passed by object { keys: '...' }
- * Might be useful, when you want to pass some other data to your handler
  */
 
 (function(jQuery) {
@@ -112,12 +102,13 @@
       "\\": "|"
     },
 
-    // excludes: button, checkbox, file, hidden, image, password, radio, reset, search, submit, url
+    // input 类型，不包括：
+    // button, checkbox, file, hidden, image, password, radio, reset, search, submit, url
     textAcceptingInputTypes: [
       "text", "password", "number", "email", "url", "range", "date", "month", "week", "time", "datetime",
       "datetime-local", "search", "color", "tel"],
 
-    // default input types not to bind to unless bound directly
+    // 除非直接绑定，否则默认情况下 input 不会绑定监听
     textInputTypes: /textarea|input|select/i,
 
     options: {
@@ -143,7 +134,6 @@
       };
     }
 
-    // Only care when a possible input has been specified
     if (!handleObj.data || !handleObj.data.keys || typeof handleObj.data.keys !== "string") {
       return;
     }
@@ -152,17 +142,23 @@
       keys = handleObj.data.keys.toLowerCase().split(" ");
 
     handleObj.handler = function(event) {
-      //      Don't fire in text-accepting inputs that we didn't directly bind to
+      // 对于 inputs，因为在默认情况下不会绑定监听，因此直接返回
       if (this !== event.target &&
         (jQuery.hotkeys.options.filterInputAcceptingElements &&
           jQuery.hotkeys.textInputTypes.test(event.target.nodeName) ||
           (jQuery.hotkeys.options.filterContentEditable && jQuery(event.target).attr('contenteditable')) ||
           (jQuery.hotkeys.options.filterTextInputs &&
+            // 通过 jQuery.inArray 判断 target 是否在一个 Array 里
             jQuery.inArray(event.target.type, jQuery.hotkeys.textAcceptingInputTypes) > -1))) {
         return;
       }
 
+      /*
+       * event.which 为按键 code，type 为 int
+       * 通过 jQuery.hotkeys.specialKeys[event.which] 拿到其按键名称
+       */
       var special = event.type !== "keypress" && jQuery.hotkeys.specialKeys[event.which],
+      // String.fromCharCode() 静态方法根据指定的 Unicode 编码中的序号值来返回一个字符串
         character = String.fromCharCode(event.which).toLowerCase(),
         modif = "",
         possible = {};
@@ -207,14 +203,21 @@
    * jQuery(elem).bind(type, data, callback)
    * 实际上是映射到 jQuery.event.add(elem, types, handler, data)
    * http://benalman.com/news/2010/03/jquery-special-events
-   * 通过 jQuery.event.special.xxxEvent = {} 来创建一个新的事件
+   *
+   * 通过
+   * jQuery.event.special.xxxEvent = {
+   *  setup: func, 在事件被bind时调用，仅调用一次
+   *  teardown: func, 在解除bind时调用，仅调用一次
+   *  add: func，每次绑定到元素上的时候都会调用
+   * }
+   * 来创建一个新的事件
+   *
    * 也就是说，通过调用下面的方法之后，在
-   * $(dom).bind('keydown', key, callback) 时会触发 keyHandler 方法
+   * $(dom).bind('keydown', key, callback)，或者 keyup/keypress 时会触发 keyHandler 方法
    * keyHandler 方法是 keydown 时会触发的方法，在其中对 key 进行判断，针对响应的 key 进行 callback 回调
    */
   jQuery.each(["keydown", "keyup", "keypress"], function() {
     jQuery.event.special[this] = {
-      // add 在处理事件绑定时被调用,该方法触发后,会继续执行正常的绑定流程
       add: keyHandler
     };
   });
