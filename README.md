@@ -21,6 +21,12 @@
 - 可根据预设和是否是 retina 屏幕加载高清图片
 - 可进行视频懒加载
 
+```javascript
+new Blazy({
+  success() {}
+})
+```
+
 值得学习的方面：
 
 - 针对低版本浏览器的兼容性处理，在没有某些 API 时（例如 querySelectorAll）则进行创建
@@ -56,6 +62,11 @@
 
 一个兼容多平台多种类浏览器的 notification 插件，封装了各种浏览器下的`Notification API`
 
+```javascript
+Push.create('Hello World!');
+Push.count();
+```
+
 值得学习的方面：
 
 - 浏览器兼容性处理
@@ -68,6 +79,11 @@
 > 源码分析戳这里：[nprogress analysis](./analysis/nprogress.js)
 
 一个在页面（或特定容器）顶部创建进度条的插件。
+
+```javascript
+NProgress.start();
+NProgress.done();
+```
 
 值得学习的方面：
 
@@ -100,6 +116,13 @@ cookies({ token: null });     // Eat it
 
 通过封装`localStorage` API，提供了友好的操作，并兼容IE，可储存`Object`
 
+```javascript
+store.set('username', 'marcus');
+store.get('username');
+store.remove('username');
+store.clear();
+```
+
 值得学习的方面：
 
 - `localStorage`操作
@@ -127,7 +150,8 @@ $(document).bind('keydown', 'ctrl+a', fn);
 - [x] [cookies.js](https://github.com/franciscop/cookies.js)
 - [x] [store.js](https://github.com/marcuswestin/store.js)
 - [ ] [KeyboardJS](https://github.com/RobertWHurst/KeyboardJS)
-- [ ] [jquery.hotkeys](https://github.com/jeresig/jquery.hotkeys)
+- [x] [jquery.hotkeys](https://github.com/jeresig/jquery.hotkeys)
+- [ ] [validator.js](https://github.com/chriso/validator.js)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
