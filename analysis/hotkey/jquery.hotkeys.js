@@ -120,6 +120,8 @@
 
   /**
    * special event method
+   * keyHandler 方法是 keydown 时会触发的方法，
+   * 在其中对 key 进行判断，针对响应的 key 进行 callback 回调
    * @param handleObj
    * handleObj: {
    *  type: event 名称
@@ -138,7 +140,9 @@
       return;
     }
 
+    // origHandler 是事件监听的回调，即用户注册监听事件时所定义的 callback
     var origHandler = handleObj.handler,
+    // 可以一次绑定监听多种按键组合，不同组合之间使用空格分隔
       keys = handleObj.data.keys.toLowerCase().split(" ");
 
     handleObj.handler = function(event) {
@@ -163,22 +167,32 @@
         modif = "",
         possible = {};
 
+      /*
+       * 对 alt/ctrl/shift 组合键的判断
+       * 如果 special 不是 alt/ctrl/shift 中的任一个，且 存在 event.altKey/event.ctrlKey/event.shiftKey，
+       * 则可以认为 alt/ctrl/shift 键处于按下的状态
+       */
       jQuery.each(["alt", "ctrl", "shift"], function(index, specialKey) {
-
         if (event[specialKey + 'Key'] && special !== specialKey) {
           modif += specialKey + '+';
         }
       });
 
-      // metaKey is triggered off ctrlKey erronously
+      /*
+       * 对 metaKey 组合键的判断
+       * event.metaKey
+       * 在 Mac 上代表 command 键，在 Windows 上则代表 win 键
+       */
       if (event.metaKey && !event.ctrlKey && special !== "meta") {
         modif += "meta+";
       }
 
+      // 如果同时按下了 alt+ctrl+shift 和 meta 键
       if (event.metaKey && special !== "meta" && modif.indexOf("alt+ctrl+shift+") > -1) {
         modif = modif.replace("alt+ctrl+shift+", "hyper+");
       }
 
+      // 对获取的按键码进行组合
       if (special) {
         possible[modif + special] = true;
       }
@@ -186,12 +200,15 @@
         possible[modif + character] = true;
         possible[modif + jQuery.hotkeys.shiftNums[character]] = true;
 
-        // "$" can be triggered as "Shift+4" or "Shift+$" or just "$"
+        // 将 Shift+keyCode 转换为 keyCode
+        // 例如，
+        // "$" 可以被认为是 "Shift+4" 或者 "Shift+$" 或者 "$"
         if (modif === "shift+") {
           possible[jQuery.hotkeys.shiftNums[character]] = true;
         }
       }
 
+      // 如果绑定的按键(组合)中有任意一个被触发，则就触发回调
       for (var i = 0, l = keys.length; i < l; i++) {
         if (possible[keys[i]]) {
           return origHandler.apply(this, arguments);
@@ -199,6 +216,7 @@
       }
     };
   }
+
   /*
    * jQuery(elem).bind(type, data, callback)
    * 实际上是映射到 jQuery.event.add(elem, types, handler, data)
@@ -214,7 +232,7 @@
    *
    * 也就是说，通过调用下面的方法之后，在
    * $(dom).bind('keydown', key, callback)，或者 keyup/keypress 时会触发 keyHandler 方法
-   * keyHandler 方法是 keydown 时会触发的方法，在其中对 key 进行判断，针对响应的 key 进行 callback 回调
+   * keyHandler 默认接收一个参数 handleObj，事件绑定时的 callback 会赋值给 handleObj.handler
    */
   jQuery.each(["keydown", "keyup", "keypress"], function() {
     jQuery.event.special[this] = {
