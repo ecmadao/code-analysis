@@ -144,6 +144,26 @@ $(document).bind('keydown', 'ctrl+a', fn);
 - jQuery 插件编写
 - 键盘事件的监听和处理
 
+### [object-assign](https://github.com/sindresorhus/object-assign)
+
+> 源码分析戳这里：[object-assign analysis](./analysis/object-assign.js)
+
+针对于`Object.assign`的`ponyfill`，兼容性很好
+
+```javascript
+// 原生 Object.assign
+Object.assign({}, target, obj1, obj2...);
+// object-assign
+import objectAssign from 'object-assign';
+objectAssign({}, target, obj1, obj2...);
+```
+
+值得学习的方面：
+
+- 获取对象可枚举属性
+- 遍历对象属性
+- `hasOwnProperty` & `propertyIsEnumerable`
+
 ## Todo
 
 - [x] [push.js](https://github.com/Nickersoft/push.js)
@@ -156,7 +176,7 @@ $(document).bind('keydown', 'ctrl+a', fn);
 - [ ] [data.js](https://github.com/yanhaijing/data.js)
 - [ ] [cookie.js](https://github.com/florian/cookie.js/blob/master/cookie.js)
 - [ ] [js-bits](https://github.com/vasanthk/js-bits)
-- [ ] [object-assign](https://github.com/sindresorhus/object-assign)
+- [x] [object-assign](https://github.com/sindresorhus/object-assign)
 - [ ] [why-did-you-update](https://github.com/garbles/why-did-you-update)
 - [ ] [tipso](https://github.com/object505/tipso/blob/master/src/tipso.js)
 - [ ] [timeago.js](https://github.com/hustcc/timeago.js)
