@@ -174,13 +174,13 @@ objectAssign({}, target, obj1, obj2...);
 - [ ] [validator.js](https://github.com/chriso/validator.js)
 - [ ] [doctoc](https://github.com/thlorenz/doctoc)
 - [ ] [data.js](https://github.com/yanhaijing/data.js)
-- [ ] [cookie.js](https://github.com/florian/cookie.js/blob/master/cookie.js)
+- [ ] [cookie.js](https://github.com/florian/cookie.js)
 - [ ] [js-bits](https://github.com/vasanthk/js-bits)
 - [x] [object-assign](https://github.com/sindresorhus/object-assign)
 - [ ] [why-did-you-update](https://github.com/garbles/why-did-you-update)
-- [ ] [tipso](https://github.com/object505/tipso/blob/master/src/tipso.js)
+- [ ] [tipso](https://github.com/object505/tipso)
 - [ ] [timeago.js](https://github.com/hustcc/timeago.js)
-- [ ] [Edit-This-Cookie](https://github.com/fcapano/Edit-This-Cookie/blob/master/manifest.json)
+- [ ] [Edit-This-Cookie](https://github.com/fcapano/Edit-This-Cookie)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 

@@ -9,10 +9,24 @@
  *
  * Object.prototype.propertyIsEnumerable(prop)
  * 返回一个布尔值，表明指定的属性名是否是当前对象可枚举的自身属性。即属性既是 ownProperty，又 enumerable
+ *
  */
+
 var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+/**
+ * 对象属性的遍历
+ *
+ * 通过 for..in.. 来遍历对象以及原型链上可枚举的属性，不包含 Symbol
+ * Object.keys(obj) 获取对象上的可枚举属性，不包括原型链，≈ for..in.. + hasOwnProperty
+ * Object.getOwnPropertyNames(obj) 获取对象上的全部属性（包括不可枚举属性）
+ *
+ * 更多内容，可见：属性的可枚举性和所有权
+ * https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
+ *
+ */
 
 function toObject(val) {
 	if (val === null || val === undefined) {
