@@ -152,6 +152,15 @@ $(document).bind('keydown', 'ctrl+a', fn);
 - [ ] [KeyboardJS](https://github.com/RobertWHurst/KeyboardJS)
 - [x] [jquery.hotkeys](https://github.com/jeresig/jquery.hotkeys)
 - [ ] [validator.js](https://github.com/chriso/validator.js)
+- [ ] [doctoc](https://github.com/thlorenz/doctoc)
+- [ ] [data.js](https://github.com/yanhaijing/data.js)
+- [ ] [cookie.js](https://github.com/florian/cookie.js/blob/master/cookie.js)
+- [ ] [js-bits](https://github.com/vasanthk/js-bits)
+- [ ] [object-assign](https://github.com/sindresorhus/object-assign)
+- [ ] [why-did-you-update](https://github.com/garbles/why-did-you-update)
+- [ ] [tipso](https://github.com/object505/tipso/blob/master/src/tipso.js)
+- [ ] [timeago.js](https://github.com/hustcc/timeago.js)
+- [ ] [Edit-This-Cookie](https://github.com/fcapano/Edit-This-Cookie/blob/master/manifest.json)
 
 > 欢迎`pull request` & `issue`提出值得分析源码的项目
 
